@@ -16,58 +16,57 @@ exports.Customer = function (id,public_key,secret_key){
         "Authorization":`Bearer ${this.secret_key}`
     };
 
-    this.createWallet = CreateWallet(this.headers);
-    this.getWalletDetails = GetWalletDetails(this.headers);
-    this.getCurrencies = GetCurrencies(this.headers);
+    this.createWallet = async function(){return CreateWallet(this.headers);}
+    this.getWalletDetails = async function(wallet_id){return GetWalletDetails(this.headers,wallet_id)};
+    this.getCurrencies = async function(){return GetCurrencies(this.headers)};
 
-    this.creditWallet = function (payload,wallet_id){
+    this.creditWallet = async function (payload,wallet_id){
         return CreditWallet(this.headers,payload,wallet_id);
     }
-    this.debitWallet = function(payload,wallet_id){
+    this.debitWallet = async function(payload,wallet_id){
         DebitWallet(this.headers,payload,wallet_id);
     }
 
-    this.getTransactions = function(wallet_id){
+    this.getTransactions = async function(wallet_id){
         GetTransactions(this.headers,wallet_id);
     }
+
+    return this;
 }
 
 
-function CreateWallet(head){
+async function CreateWallet(head){
     fetch(url + '/wallet',{
         method: "POST",
         headers: head
     })
     .then(resp => resp.json())
     .then(data => {
-        console.log(data);
         return data;
     })
 }
 
-function GetWalletDetails(head){
-    fetch(url + `/wallet/${head.id}`,{
+async function GetWalletDetails(head,wallet_id){
+    fetch(url + `/wallet/${wallet_id}`,{
         headers : head
     })
     .then(resp => resp.json())
     .then(data => {
-        console(data)
         return data;
     })
 }
 
-function GetCurrencies(head){
+async function GetCurrencies(head){
     fetch(url+'/currencies',{
         headers : head
     })
     .then(resp => resp.json())
     .then(data => {
-        console.log(data)
         return data;
     })
 }
 
-function CreditWallet(head,payload,wallet_id){
+async function CreditWallet(head,payload,wallet_id){
     fetch(url+`/wallet/credit/${wallet_id}`,{
         headers : head,
         method:"POST",
@@ -75,11 +74,10 @@ function CreditWallet(head,payload,wallet_id){
     })
     .then(resp => resp.json())
     .then(data => {
-        console.log(data)
         return data;
     })
 }
-function DebitWallet(head,payload,wallet_id){
+async function DebitWallet(head,payload,wallet_id){
     fetch(url+`/wallet/debit/${wallet_id}`,{
         headers : head,
         method:"POST",
@@ -87,18 +85,16 @@ function DebitWallet(head,payload,wallet_id){
     })
     .then(resp => resp.json())
     .then(data => {
-        console.log(data)
         return data;
     })
 }
 
-function GetTransactions(wallet_id){
+async function GetTransactions(wallet_id){
     fetch(url+`/wallet/transactions/${wallet_id}`,{
         headers:head
     })
     .then(resp => resp.json())
     .then(data => {
-        console.log(data)
         return data;
     })
 }
